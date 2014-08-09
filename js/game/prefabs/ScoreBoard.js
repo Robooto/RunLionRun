@@ -163,7 +163,7 @@ Scoreboard.prototype.getName = function(name) {
     }
 
     if (name == '' || name == 'null' || name == null) {
-        name = 'Guest';
+        name = 'Guest' + game.rnd.integer();
     }
 
     while (name.length > 20) {

@@ -32,8 +32,6 @@ BasicGame.Preloader.prototype = {
         // wounded lion
         this.game.load.spritesheet('hurtlion', 'assets/images/woundedlion.png', 80, 49);
 
-        this.game.load.spritesheet('enemy', 'assets/images/enemy.png', 20, 20); // enemty
-
         this.game.load.image('walltest', 'assets/images/walltest.png'); // short wall
         this.game.load.image('medWall', 'assets/images/medWall.png');
         this.game.load.image('tallWall', 'assets/images/tallWall.png');

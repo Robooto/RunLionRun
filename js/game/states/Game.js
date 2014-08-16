@@ -56,7 +56,8 @@ BasicGame.Game.prototype = {
         this.lionBonus = 0;
         this.activateDoubleJump = false; // debugging remove when done
 
-        this.canDoubleJump = true; // flag for tracking double jump
+        this.jumpAmount = 0;
+
         this.canVariableJump = true; // flag for variable jumping
 
         // enemy test
@@ -201,7 +202,7 @@ BasicGame.Game.prototype = {
         game.physics.arcade.overlap(this.lion, this.fists, this.hitFist, null, this);
 
         // call jump function
-        this.jumpLion();
+        this.jumpLion2();
 
         this.moveLion(); // lion movement
 
@@ -258,48 +259,33 @@ BasicGame.Game.prototype = {
 
     },
 
-    jumpLion: function() {
+    jumpLion2: function() {
+    var onTheGround = this.lion.body.touching.down;
 
-        // Set a variable that is true when the player is touching the ground
-        var onTheGround = this.lion.body.touching.down;
+    if (this.activateDoubleJump) {
+        if (onTheGround) this.jumpAmount = 0;
+    } else {
+        if (onTheGround) this.jumpAmount = 4;
+    }
 
-        // if activate double jump is true let lion double jump
-        if (this.activateDoubleJump) {
-            if (onTheGround) this.canDoubleJump = true;
+    // Jump the player if the spacebar is pressed
+        // The longer the spacebar is pressed, the longer the jump
+        if ((this.input.keyboard.justPressed(Phaser.Keyboard.UP) || this.input.keyboard.justPressed(Phaser.Keyboard.W) || this.game.input.activePointer.justPressed(65)) && this.jumpAmount < 5) {
+            this.lion.body.velocity.y = this.LION_JUMP;
+            this.timeJump = 0;
+            this.jumpAmount++;
         }
-
-        if (this.upInputIsActive(5)) {
-            // Allow the player to adjust his jump height by holding the jump button
-
-            // if double jump is active lion can double jump else lion can only single jump
-            if (this.activateDoubleJump) {
-                if (this.canDoubleJump) this.canVariableJump = true;
-            } else {
-                if (onTheGround) this.canVariableJump = true;
-            }
-
-            if (this.canDoubleJump || onTheGround) {
-                // Jump when the player is touching the ground or they can double jump
-                this.lion.body.velocity.y = this.LION_JUMP;
-
-                // Disable ability to double jump if the player is jumping in the air
-                if (!onTheGround) this.canDoubleJump = false;
-
-                this.jumpSound.play();
-            }
-        }
-
-        // Keep y velocity constant while the jump button is held for up to 150 ms
-        if (this.canVariableJump && this.upInputIsActive(150)) {
+        else if ((this.input.keyboard.isDown(Phaser.Keyboard.UP) || this.input.keyboard.isDown(Phaser.Keyboard.W) || this.game.input.activePointer.isDown) && this.timeJump < 8) {
+            this.timeJump += 1;
             this.lion.body.velocity.y = this.LION_JUMP;
         }
-
-        // Don't allow variable jump height after the jump button is released
-        if (this.input.keyboard.justReleased(Phaser.Keyboard.UP) || this.game.input.activePointer.justReleased() || this.input.keyboard.justReleased(Phaser.Keyboard.W)) {
-            this.canVariableJump = false;
+        else if (this.input.keyboard.justReleased(Phaser.Keyboard.UP) || this.input.keyboard.justReleased(Phaser.Keyboard.W) || this.game.input.activePointer.justReleased()) {
+            this.timeJump = 8;
+            
+            
         }
 
-        // Play the correct animation
+         // Play the correct animation
         if (this.lion.body.touching.down == false) {
             this.lion.frame = 10;
         }
@@ -317,18 +303,10 @@ BasicGame.Game.prototype = {
         }
 
 
+
     },
 
-    upInputIsActive: function(duration) {
-        var isActive = false;
-
-        isActive = this.input.keyboard.justPressed(Phaser.Keyboard.UP, duration) || this.input.keyboard.justPressed(Phaser.Keyboard.W, duration);
-        isActive |= (this.game.input.activePointer.justPressed(duration + 1000 / 60))
-
-        return isActive;
-
-        // returns true for our duration so we can variable jump
-    },
+    
 
 
     bonus: function(lion) {
